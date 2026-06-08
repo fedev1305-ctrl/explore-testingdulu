@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Itinowa - Explore Indonesia | Travel Destination Detector</title>
+    
+    <!-- Bootstrap Icons CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+    
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+        min-height: 100vh;
+        padding: 24px;
+        /* ========================================== */
+        /* BACKGROUND UTAMA PAKAI GAMBAR ANDA */
+        /* GANTI 'background-utama.jpg' DENGAN FILE GAMBAR ANDA */
+        /* ========================================== */
+        background-image: url('bromo2.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        position: relative;
+      }
+
+      /* Overlay tipis biar card lebih terbaca (opsional, bisa diatur transparansinya) */
+      body::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: 0;
+      }
+
+      /* Container utama - FULL WIDTH */
+      .main-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Header Hero - PAKAI GAMBAR LOGO ANDA */
+      .hero-section {
+        background: transparent;
+        border-radius: 32px;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 32px;
+        position: relative;
+      }
+
+      /* GAMBAR LOGO/TULISAN EXPLORE Indonesia WITH itinova */
+      .logo-image {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+      }
+
+      /* Grid 2 kolom untuk desktop - TETAP DI PERTAHANKAN */
+      .content-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+        margin-bottom: 32px;
+      }
+
+      /* Card style umum - semi transparan biar background keliatan */
+      .card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 32px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        backdrop-filter: blur(0px);
+      }
+
+      .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 28px 48px rgba(0, 0, 0, 0.25);
+      }
+
+      .card-header {
+        background: linear-gradient(135deg, #0f4c3f 0%, #1b6b5e 100%);
+        padding: 24px 28px;
+        color: white;
+      }
+
+      .card-header h2 {
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .card-header h2 i {
+        font-size: 28px;
+      }
+
+      .card-header p {
+        font-size: 14px;
+        opacity: 0.85;
+        margin-top: 6px;
+      }
+
+      .card-body {
+        padding: 28px;
+      }
+
+      /* Scanner section */
+      .btn-scan {
+        width: 100%;
+        background: linear-gradient(135deg, #f5a623 0%, #f39c12 100%);
+        border: none;
+        padding: 16px;
+        border-radius: 60px;
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 24px;
+      }
+
+      .btn-scan i {
+        font-size: 22px;
+      }
+
+      .btn-scan:hover {
+        transform: scale(1.02);
+        background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        box-shadow: 0 8px 20px rgba(245, 166, 35, 0.4);
+      }
+
+      .webcam-wrapper {
+        background: #1a1a2e;
+        border-radius: 24px;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      #webcam-container {
+        display: flex;
+        justify-content: center;
+      }
+
+      #webcam-container canvas {
+        border-radius: 20px;
+        width: 100%;
+        max-width: 400px;
+        height: auto;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      }
+
+      .status-indicator {
+        background: #f0f4f8;
+        padding: 14px 20px;
+        border-radius: 60px;
+        margin-top: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 14px;
+      }
+
+      .status-indicator i {
+        font-size: 18px;
+        margin-right: 8px;
+      }
+
+      .status-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 12px;
+        background: #e74c3c;
+        transition: all 0.3s;
+      }
+
+      .status-dot.active {
+        background: #2ecc71;
+        box-shadow: 0 0 12px #2ecc71;
+        animation: pulse 1.5s infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(1.3); }
+      }
+
+      /* Predictions grid */
+      .predictions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 12px;
+        margin-top: 20px;
+      }
+
+      .prediction-item {
+        background: #f8fafe;
+        padding: 12px 16px;
+        border-radius: 60px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s;
+        border: 1px solid #e0e0e0;
+      }
+
+      .prediction-item:hover {
+        background: #e8f0fe;
+        transform: translateX(4px);
+      }
+
+      .prediction-name {
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .prediction-name i {
+        font-size: 16px;
+        color: #f5a623;
+      }
+
+      .prediction-prob {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 4px 12px;
+        border-radius: 40px;
+        color: white;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      /* Result section */
+      .result-header {
+        background: linear-gradient(135deg, #0f4c3f 0%, #1b6b5e 100%);
+        padding: 24px 28px;
+        text-align: center;
+        color: white;
+      }
+
+      .result-header h2 {
+        font-size: 32px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+      }
+
+      .result-header h2 i {
+        font-size: 36px;
+      }
+
+      .badge-conf {
+        background: rgba(255, 255, 255, 0.2);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        border-radius: 40px;
+        font-size: 13px;
+      }
+
+      .badge-conf i {
+        font-size: 14px;
+      }
+
+      .info-section {
+        padding: 20px 28px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .info-section:last-child {
+        border-bottom: none;
+      }
+
+      .info-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #0f4c3f;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+
+      .info-title i {
+        font-size: 22px;
+      }
+
+      .info-list {
+        list-style: none;
+        padding-left: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 12px;
+      }
+
+      .info-list li {
+        padding: 12px 16px;
+        background: #f8fafe;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 14px;
+        color: #4a5568;
+        transition: all 0.2s;
+        border: 1px solid #e0e0e0;
+      }
+
+      .info-list li:hover {
+        background: #e8f0fe;
+        transform: translateX(6px);
+      }
+
+      .info-list li i {
+        font-size: 20px;
+        min-width: 28px;
+      }
+
+      /* Travel tip section */
+      .travel-tip {
+        background: rgba(255, 248, 231, 0.95);
+        padding: 20px 28px;
+        border-radius: 28px;
+        margin-top: 32px;
+        text-align: center;
+        font-size: 14px;
+        color: #b86b00;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .travel-tip i {
+        font-size: 20px;
+      }
+
+      /* Footer */
+      .footer {
+        text-align: center;
+        padding: 24px;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.8);
+        margin-top: 32px;
+        border-top: 1px solid rgba(255, 255, 255, 0.3);
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+      }
+
+      .footer i {
+        margin: 0 4px;
+      }
+
+      /* Responsive untuk tablet & mobile */
+      @media (max-width: 900px) {
+        .content-grid {
+          grid-template-columns: 1fr;
+          gap: 24px;
+        }
+        body {
+          padding: 16px;
+        }
+        .info-list {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .card-body {
+          padding: 20px;
+        }
+        .predictions-grid {
+          grid-template-columns: 1fr;
+        }
+        .result-header h2 {
+          font-size: 24px;
+        }
+      }
+
+      /* Loading animation */
+      .loader {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #f5a623;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main-container">
+      <!-- Header Hero - PAKAI GAMBAR LOGO ANDA -->
+      <div class="hero-section">
+        <!-- 
+          ==========================================
+          GANTI 'logo-explore.png' DENGAN FILE GAMBAR TULISAN ANDA
+          ==========================================
+        -->
+        <img src="text.png" alt="EXPLORE Indonesia WITH itinova" class="logo-image">
+      </div>
+
+      <!-- Grid 2 Kolom: Kamera Kiri, Hasil Kanan -->
+      <div class="content-grid">
+        <!-- Kolom Kiri: Scanner -->
+        <div class="card">
+          <div class="card-header">
+            <h2><i class="bi bi-qr-code-scan"></i> Scan Destination</h2>
+            <p><i class="bi bi-camera"></i> Arahkan kamera ke landmark atau tempat wisata</p>
+          </div>
+          <div class="card-body">
+            <button class="btn-scan" onclick="startCamera()"><i class="bi bi-camera-fill"></i> Mulai Kamera</button>
+
+            <div class="webcam-wrapper" id="webcam-wrapper" style="display: none">
+              <div id="webcam-container"></div>
+              <div class="status-indicator">
+                <span><i class="bi bi-eye-fill"></i> Status Deteksi Real-time</span>
+                <div class="status-dot" id="statusDot"></div>
+              </div>
+            </div>
+
+            <div id="label-container" class="predictions-grid">
+              <div class="prediction-item" style="justify-content: center; grid-column: 1/-1; color: #7f8c8d">
+                <i class="bi bi-lightbulb"></i> Klik "Mulai Kamera" untuk memulai deteksi
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kolom Kanan: Hasil Deteksi & Rekomendasi -->
+        <div class="card" id="result-card">
+          <div class="result-header">
+            <h2><i class="bi bi-pin-map-fill"></i> <span id="detected-place">-</span></h2>
+            <div class="badge-conf" id="confidence-badge"><i class="bi bi-check-circle"></i> Belum ada deteksi</div>
+          </div>
+          <div class="info-section">
+            <div class="info-title"><i class="bi bi-bus-front-fill"></i> Transportasi Umum</div>
+            <ul id="transum-list" class="info-list">
+              <li><i class="bi bi-hourglass-split"></i> Arahkan kamera ke tempat wisata</li>
+            </ul>
+          </div>
+          <div class="info-section">
+            <div class="info-title"><i class="bi bi-pin-map-fill"></i> Tempat Wisata Sekitar</div>
+            <ul id="nearby-list" class="info-list">
+              <li><i class="bi bi-hourglass-split"></i> Arahkan kamera ke tempat wisata</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Travel Tip -->
+      <div class="travel-tip">
+        <i class="bi bi-lightbulb-fill"></i>
+        <span>Tips Traveler: Pastikan pencahayaan cukup & objek terlihat jelas untuk hasil deteksi maksimal</span>
+        <i class="bi bi-star-fill"></i>
+      </div>
+
+      <div class="footer">
+        <i class="bi bi-compass-fill"></i> itinowa • Explore Indonesia with Smart Detection <i class="bi bi-compass-fill"></i>
+      </div>
+    </div>
+
+    <!-- Load TensorFlow.js dan Teachable Machine -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.18.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8.5/dist/teachablemachine-image.min.js"></script>
+
+    <script>
+      // ============================================
+      // GANTI URL INI DENGAN LINK MODEL ANDA
+      // ============================================
+      const URL = "https://teachablemachine.withgoogle.com/models/WW3knJW5F/";
+
+      let model, webcam, maxPredictions;
+      let isScanning = false;
+
+      // DATABASE TEMPAT WISATA
+      const travelData = {
+        "Candi Prambanan": {
+          transum: [
+            "<i class='bi bi-train-front'></i> KRL Commuter Line (Stasiun Brambanan, lanjut ojek) - Rp 5-8rb",
+            "<i class='bi bi-bus-front'></i> TransJogja Jalur 1A (Halte Prambanan) - Rp 3.600",
+            "<i class='bi bi-car-front'></i> Gojek/Grab dari Stasiun Tugu - Rp 40-60rb"
+          ],
+          nearby: [
+            "<i class='bi bi-building'></i> Candi Sewu (500m, satu kompleks)",
+            "<i class='bi bi-building'></i> Candi Plaosan (2km, candi Buddha)",
+            "<i class='bi bi-mountain'></i> Tebing Breksi (4km, spot foto)",
+            "<i class='bi bi-building'></i> Ratu Boko (5km, istana kuno)"
+          ],
+        },
+        Malioboro: {
+          transum: [
+            "<i class='bi bi-walk'></i> Jalan kaki dari Stasiun Yogyakarta/Tugu (200m)",
+            "<i class='bi bi-bus-front'></i> TransJogja Jalur 1A, 2A, 3A (Halte Malioboro)",
+            "<i class='bi bi-scooter'></i> Becak motor - Rp 15-25rb keliling area"
+          ],
+          nearby: [
+            "<i class='bi bi-shop'></i> Pasar Beringharjo (oleh-oleh khas)",
+            "<i class='bi bi-building'></i> Benteng Vredeburg (museum perjuangan)",
+            "<i class='bi bi-geo-alt'></i> Titik Nol Kilometer Yogyakarta",
+            "<i class='bi bi-building'></i> Keraton Kesultanan Yogyakarta (1,5km)"
+          ],
+        },
+        Uluwatu: {
+          transum: [
+            "<i class='bi bi-bus-front'></i> Bus Trans Sarbagita Koridor 1",
+            "<i class='bi bi-scooter'></i> Ojek online (disarankan karena transum terbatas)",
+            "<i class='bi bi-car-front'></i> Sewa motor harian - Rp 60-80rb"
+          ],
+          nearby: [
+            "<i class='bi bi-water'></i> Pantai Suluban (hidden gem)",
+            "<i class='bi bi-water'></i> Pantai Padang Padang (surf spot)",
+            "<i class='bi bi-sunset'></i> Pantai Bingin (sunset)",
+            "<i class='bi bi-building'></i> GWK Cultural Park (15 menit)"
+          ],
+        },
+        Braga: {
+          transum: [
+            "<i class='bi bi-train-front'></i> Kereta KAI (Turun Stasiun Bandung, jalan kaki 1km)",
+            "<i class='bi bi-bus-front'></i> Angkot rute Kalapa-Ledeng",
+            "<i class='bi bi-car-front'></i> Gojek/Grab dari mana saja di Bandung"
+          ],
+          nearby: [
+            "<i class='bi bi-building'></i> Jalan Asia Afrika (500m, heritage)",
+            "<i class='bi bi-tree'></i> Alun-Alun Bandung (800m)",
+            "<i class='bi bi-building'></i> Museum Konferensi Asia Afrika (600m)"
+          ],
+        },
+        "Labuan Bajo": {
+          transum: [
+            "<i class='bi bi-airplane'></i> Pesawat ke Bandara Komodo (LBJ)",
+            "<i class='bi bi-car-front'></i> Taksi bandara ke pelabuhan - Rp 50-70rb",
+            "<i class='bi bi-scooter'></i> Rental motor - Rp 80-100rb/hari"
+          ],
+          nearby: [
+            "<i class='bi bi-water'></i> Pantai Pede (2km dari kota)",
+            "<i class='bi bi-mountain'></i> Bukit Sylvia (spot sunset)",
+            "<i class='bi bi-cave'></i> Gua Batu Cermin (3km)",
+            "<i class='bi bi-geo-alt'></i> Dermaga Putih (pusat wisata)"
+          ],
+        },
+        "Candi Borobudur": {
+          transum: [
+            "<i class='bi bi-bus-front'></i> Bus DAMRI dari Bandara YIA / Stasiun Tugu Jogja",
+            "<i class='bi bi-bus-front'></i> Travel dari Terminal Giwangan Jogja",
+            "<i class='bi bi-car-front'></i> Rental mobil + sopir - Rp 400-500rb/hari"
+          ],
+          nearby: [
+            "<i class='bi bi-building'></i> Candi Pawon (1,5km, rute ke Borobudur)",
+            "<i class='bi bi-building'></i> Candi Mendut (2km, patung Buddha besar)",
+            "<i class='bi bi-mountain'></i> Punthuk Setumbu (sunrise spot, 3km)",
+            "<i class='bi bi-building'></i> Gereja Ayam Bukit Rhema (4km)"
+          ],
+        },
+        Bromo: {
+          transum: [
+            "<i class='bi bi-train-front'></i> Kereta KAI (Turun Stasiun Probolinggo atau Malang)",
+            "<i class='bi bi-bus-front'></i> Travel/ELF lanjut ke Cemoro Lawang",
+            "<i class='bi bi-car-front'></i> Sewa Jeep Bromo - Rp 450-600rb/jeep (4-5 orang)"
+          ],
+          nearby: [
+            "<i class='bi bi-mountain'></i> Kawah Bromo (spot utama)",
+            "<i class='bi bi-tree'></i> Pasir Berbisik / Bukit Teletubbies",
+            "<i class='bi bi-mountain'></i> Bukit Kingkong & Love Hill",
+            "<i class='bi bi-sunrise'></i> Puncak Penanjakan (sunrise terbaik)"
+          ],
+        },
+      };
+
+      async function startCamera() {
+        const labelDiv = document.getElementById("label-container");
+        const webcamWrapper = document.getElementById("webcam-wrapper");
+        const statusDot = document.getElementById("statusDot");
+
+        labelDiv.innerHTML = '<div class="prediction-item" style="justify-content: center; grid-column: 1/-1;"><span class="loader"></span> Memuat model AI...</div>';
+
+        try {
+          const modelURL = URL + "model.json";
+          const metadataURL = URL + "metadata.json";
+
+          const testFetch = await fetch(modelURL);
+          if (!testFetch.ok) {
+            throw new Error("Model tidak dapat diakses");
+          }
+
+          model = await tmImage.load(modelURL, metadataURL);
+          maxPredictions = model.getTotalClasses();
+          console.log("✅ Model loaded!", maxPredictions, "classes");
+
+          webcam = new tmImage.Webcam(400, 400, true);
+          await webcam.setup();
+          await webcam.play();
+
+          const container = document.getElementById("webcam-container");
+          container.innerHTML = "";
+          container.appendChild(webcam.canvas);
+          webcamWrapper.style.display = "block";
+
+          labelDiv.innerHTML = "";
+          for (let i = 0; i < maxPredictions; i++) {
+            const div = document.createElement("div");
+            div.className = "prediction-item";
+            div.innerHTML = `<span class="prediction-name"><i class="bi bi-image"></i> Loading...</span><span class="prediction-prob">0%</span>`;
+            labelDiv.appendChild(div);
+          }
+
+          statusDot.classList.add("active");
+          isScanning = true;
+          requestAnimationFrame(detectLoop);
+        } catch (error) {
+          console.error("Error:", error);
+          labelDiv.innerHTML = `
+            <div class="prediction-item" style="justify-content: center; background: #fee2e2; color: #c0392b; grid-column: 1/-1;">
+              <i class="bi bi-exclamation-triangle-fill"></i> Model belum siap. Pastikan URL model benar.
+            </div>
+          `;
+        }
+      }
+
+      async function detectLoop() {
+        if (!isScanning || !webcam || !model) return;
+
+        webcam.update();
+        const predictions = await model.predict(webcam.canvas);
+
+        let highestProb = 0;
+        let bestMatch = "";
+
+        for (let i = 0; i < predictions.length && i < labelContainer.children.length; i++) {
+          const prob = predictions[i].probability;
+          const className = predictions[i].className;
+          const probPercent = (prob * 100).toFixed(0);
+          const icon = getIconForPlace(className);
+
+          labelContainer.children[i].innerHTML = `
+            <span class="prediction-name"><i class="bi ${icon}"></i> ${className}</span>
+            <span class="prediction-prob">${probPercent}%</span>
+          `;
+
+          if (prob > highestProb) {
+            highestProb = prob;
+            bestMatch = className;
+          }
+        }
+
+        if (highestProb > 0.7 && bestMatch) {
+          showRecommendations(bestMatch, highestProb);
+        }
+
+        requestAnimationFrame(detectLoop);
+      }
+
+      function getIconForPlace(placeName) {
+        const icons = {
+          "Candi Prambanan": "bi-building",
+          "Malioboro": "bi-shop",
+          "Uluwatu": "bi-water",
+          "Braga": "bi-building",
+          "Labuan Bajo": "bi-geo-alt",
+          "Candi Borobudur": "bi-building",
+          "Bromo": "bi-mountain"
+        };
+        return icons[placeName] || "bi-geo-alt-fill";
+      }
+
+      function showRecommendations(placeName, confidence) {
+        const detectedPlace = document.getElementById("detected-place");
+        const confidenceBadge = document.getElementById("confidence-badge");
+        const transumList = document.getElementById("transum-list");
+        const nearbyList = document.getElementById("nearby-list");
+
+        if (travelData[placeName]) {
+          detectedPlace.innerText = placeName;
+          confidenceBadge.innerHTML = `<i class="bi bi-check-circle-fill"></i> Akurasi: ${(confidence * 100).toFixed(0)}% • Terdeteksi otomatis`;
+
+          transumList.innerHTML = "";
+          travelData[placeName].transum.forEach((item) => {
+            const li = document.createElement("li");
+            li.innerHTML = item;
+            transumList.appendChild(li);
+          });
+
+          nearbyList.innerHTML = "";
+          travelData[placeName].nearby.forEach((item) => {
+            const li = document.createElement("li");
+            li.innerHTML = item;
+            nearbyList.appendChild(li);
+          });
+        }
+      }
+
+      const labelContainer = document.getElementById("label-container");
+    </script>
+  </body>
+</html>
